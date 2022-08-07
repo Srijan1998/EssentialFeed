@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		640EBC97289FD22A00CD8A89 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640EBC96289FD22A00CD8A89 /* HTTPClient.swift */; };
 		64119B24289838A100A80580 /* EssentialFeed.docc in Sources */ = {isa = PBXBuildFile; fileRef = 64119B23289838A100A80580 /* EssentialFeed.docc */; };
 		64119B2A289838A100A80580 /* EssentialFeed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64119B1F289838A000A80580 /* EssentialFeed.framework */; };
 		64119B2F289838A100A80580 /* EssentialFeedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64119B2E289838A100A80580 /* EssentialFeedTests.swift */; };
@@ -28,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		640EBC96289FD22A00CD8A89 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		64119B1F289838A000A80580 /* EssentialFeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EssentialFeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64119B22289838A000A80580 /* EssentialFeed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EssentialFeed.h; sourceTree = "<group>"; };
 		64119B23289838A100A80580 /* EssentialFeed.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = EssentialFeed.docc; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				64BF5F9C289C1B87006C68E4 /* RemoteFeedLoader.swift */,
+				640EBC96289FD22A00CD8A89 /* HTTPClient.swift */,
 			);
 			path = "Feed Api";
 			sourceTree = "<group>";
@@ -223,6 +226,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64BF5F9D289C1B87006C68E4 /* RemoteFeedLoader.swift in Sources */,
+				640EBC97289FD22A00CD8A89 /* HTTPClient.swift in Sources */,
 				64119B3C28983A0A00A80580 /* FeedLoader.swift in Sources */,
 				64119B3A289838B900A80580 /* EssentialFeed.swift in Sources */,
 				64119B24289838A100A80580 /* EssentialFeed.docc in Sources */,
