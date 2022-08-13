@@ -83,49 +83,25 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
     
     func test_getFromURL_succeedsOnHTTPURLResponseWithData() {
-        let data = anyData()
-        let response = anyHTTPURLResponse()
-        URLProtocolStub.stub(data: data, response: response, error: nil)
+        let requestData = anyData()
+        let requestResponse = anyHTTPURLResponse()
         
-        let sut = makeSUT()
-        let expectation = expectation(description: "wait for request completion")
-        sut.get(from: anyURL()) { result in
-            switch result {
-            case let .success(receivedData, receivedResponse):
-                XCTAssertEqual(data, receivedData)
-                XCTAssertEqual(response.url, receivedResponse.url)
-                XCTAssertEqual(response.statusCode, receivedResponse.statusCode)
-                break
-            default:
-                XCTFail("Expected data: \(data) and response: \(response) but got \(result) instead")
-            }
-            expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 1.0)
+        let receivedValues = resultValuesFor(data: requestData, response: requestResponse, error: nil)
+        XCTAssertEqual(receivedValues?.data, requestData)
+        XCTAssertEqual(receivedValues?.response.url, requestResponse.url)
+        XCTAssertEqual(receivedValues?.response.statusCode, requestResponse.statusCode)
     }
     
     func test_getFromURL_succeedsWithEmptyDataOnHTTPURLResponseWithNilData() {
-        let response = anyHTTPURLResponse()
-        URLProtocolStub.stub(data: nil, response: response, error: nil)
+        let requestResponse = anyHTTPURLResponse()
         
-        let sut = makeSUT()
-        let expectation = expectation(description: "wait for request completion")
-        sut.get(from: anyURL()) { result in
-            switch result {
-            case let .success(receivedData, receivedResponse):
-                let emptyData = Data()
-                XCTAssertEqual(emptyData, receivedData)
-                XCTAssertEqual(response.url, receivedResponse.url)
-                XCTAssertEqual(response.statusCode, receivedResponse.statusCode)
-                break
-            default:
-                XCTFail("Expected response: \(response) but got \(result) instead")
-            }
-            expectation.fulfill()
-        }
+        let receivedValues = resultValuesFor(data: nil, response: requestResponse, error: nil)
         
-        wait(for: [expectation], timeout: 1.0)
+        let emptyData = Data()
+        XCTAssertEqual(receivedValues?.data, emptyData)
+        XCTAssertEqual(receivedValues?.response.url, requestResponse.url)
+        XCTAssertEqual(receivedValues?.response.statusCode, requestResponse.statusCode)
+        
     }
     
     // MARK: - Helpers
@@ -156,25 +132,44 @@ class URLSessionHTTPClientTests: XCTestCase {
     private func anyHTTPURLResponse() -> HTTPURLResponse {
         return HTTPURLResponse(url: anyURL(), statusCode: 0, httpVersion: nil, headerFields: nil)!
     }
+    
+    private func resultValuesFor(data: Data?, response: URLResponse?, error: Error?, file: StaticString = #filePath, line: UInt = #line) -> (data: Data, response: HTTPURLResponse)? {
+        var receivedValues: (data: Data, response: HTTPURLResponse)?
+        let receivedResult = resultFor(data: data, response: response, error: error, file: file, line: line)
+        switch receivedResult {
+        case let .success(data, response):
+            receivedValues = (data, response)
+        default:
+            XCTFail("Expected success got result: \(receivedResult) instead", file: file, line: line)
+        }
+        return receivedValues
+    }
 
     private func resultErrorFor(data: Data?, response: URLResponse?, error: Error?, file: StaticString = #filePath, line: UInt = #line) -> Error? {
-        URLProtocolStub.stub(data: data, response: response, error: error)
-        let sut = makeSUT(file: file, line: line)
         var receivedError: Error?
-        let expectation = expectation(description: "Wait for completion")
-        sut.get(from: anyURL()) { result in
-            switch result {
-            case let .failure(error):
-                receivedError = error
-            default:
-                XCTFail("Expected failure got result: \(result) instead", file: file, line: line)
-            }
-            expectation.fulfill()
+        let receivedResult = resultFor(data: data, response: response, error: error, file: file, line: line)
+        switch receivedResult {
+        case let .failure(error):
+            receivedError = error
+        default:
+            XCTFail("Expected failure got result: \(receivedResult) instead", file: file, line: line)
         }
-        wait(for: [expectation], timeout: 1.0)
         return receivedError
     }
     
+    private func resultFor(data: Data?, response: URLResponse?, error: Error?, file: StaticString = #filePath, line: UInt = #line) -> HTTPClientResult {
+        URLProtocolStub.stub(data: data, response: response, error: error)
+        let sut = makeSUT(file: file, line: line)
+        var receivedResult: HTTPClientResult!
+        let expectation = expectation(description: "Wait for completion")
+        sut.get(from: anyURL()) { result in
+            receivedResult = result
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+        return receivedResult
+    }
+ 
     private class URLProtocolStub: URLProtocol {
         private static var stub: Stub?
         private static var requestObserver: ((URLRequest) -> Void)?
