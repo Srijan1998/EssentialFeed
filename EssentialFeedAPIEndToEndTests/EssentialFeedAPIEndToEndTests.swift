@@ -11,16 +11,7 @@ import EssentialFeed
 class EssentialFeedAPIEndToEndTests: XCTestCase {
 
     func test_endToEndTestServerGETFeedResult_matchesFixedTestAccountData() {
-        let client = URLSessionHTTPClient()
-        let testServerURL = URL(string: "https://essentialdeveloper.com/feed-case-study/test-api/feed")!
-        let loader = RemoteFeedLoader(url: testServerURL, client: client)
-        var receivedResult: LoadFeedResult?
-        let expectation = expectation(description: "Wait for load completion")
-        loader.load { result in
-            receivedResult = result
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout:15.0)
+        let receivedResult = getFeedResult()
         
         switch receivedResult {
         case let .success(feedItems):
@@ -43,6 +34,20 @@ class EssentialFeedAPIEndToEndTests: XCTestCase {
     }
     
     //MARK: - Helpers
+    
+    private func getFeedResult() -> LoadFeedResult? {
+        let client = URLSessionHTTPClient()
+        let testServerURL = URL(string: "https://essentialdeveloper.com/feed-case-study/test-api/feed")!
+        let loader = RemoteFeedLoader(url: testServerURL, client: client)
+        var receivedResult: LoadFeedResult?
+        let expectation = expectation(description: "Wait for load completion")
+        loader.load { result in
+            receivedResult = result
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout:15.0)
+        return receivedResult
+    }
     
     private func expectedItem(at index: Int) -> FeedItem {
         return FeedItem(id: id(at: index),
